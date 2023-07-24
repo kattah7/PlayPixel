@@ -1,4 +1,4 @@
-package models
+package existence
 
 type PetsExistance struct {
 	Payload  string           `json:"payload"`

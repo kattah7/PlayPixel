@@ -1,4 +1,4 @@
-package models
+package auction
 
 import (
 	"encoding/json"

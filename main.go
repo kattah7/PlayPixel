@@ -2,34 +2,42 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
-	"log"
 	"os"
 
-	"github.com/kattah7/v3/api"
-	"github.com/kattah7/v3/models"
-	"github.com/kattah7/v3/storage"
+	"github.com/PlayPixel/api/internal/api"
+	"github.com/PlayPixel/api/internal/db"
+	"github.com/PlayPixel/api/internal/logger"
+	"github.com/PlayPixel/api/pkg/config"
+	"go.uber.org/zap"
 )
 
 func main() {
-	configFile := flag.String("config", "config.json", "json config file")
-	flag.Parse()
+	cfg := config.New()
 
-	cfg := models.NewConfig(*configFile)
+	var atomicLogLevel zap.AtomicLevel
+	var err error
 
-	store, err := storage.NewPostgresStore(context.Background(), cfg)
+	if atomicLogLevel, err = zap.ParseAtomicLevel(cfg.LogLevel); err != nil {
+		fmt.Printf("Invalid log level supplied (%s), defaulting to info\n", err)
+		atomicLogLevel = zap.NewAtomicLevelAt(zap.InfoLevel)
+	}
+	log := logger.New(atomicLogLevel, cfg.LogDevelopment)
+	defer log.Sync()
+
+	ctx := logger.OnContext(context.Background(), log)
+
+	pool, err := db.NewPool(ctx, cfg.DSN)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
+		fmt.Fprintf(os.Stderr, "unable to connect to database: %v\n", err)
 		log.Fatal(err)
 	}
 
-	defer store.Close()
-
-	if err := store.Init(); err != nil {
+	if err := db.Run(ctx, pool); err != nil {
+		fmt.Fprintf(os.Stderr, "unable to run migrations: %v\n", err)
 		log.Fatal(err)
 	}
 
-	server := api.NewAPIServer(cfg, store)
-	server.Run()
+	s := api.Init(ctx, *cfg, pool, log)
+	s.Run()
 }
