@@ -10,24 +10,43 @@ import (
 
 func (s *APIServer) Mailbox(w http.ResponseWriter, r *http.Request) error {
 	if r.Method == "POST" {
-		Mailbox := new(mailbox.MailboxAccount)
-		if err := json.NewDecoder(r.Body).Decode(Mailbox); err != nil {
+		body := new(mailbox.Mailbox)
+		if err := json.NewDecoder(r.Body).Decode(body); err != nil {
 			return err
 		}
 
-		if Mailbox.Payload == "" {
+		if body.Payload == "" {
 			return fmt.Errorf("missing payload")
 		}
 
-		switch Mailbox.Payload {
+		switch body.Payload {
 		case "INSERT_MAILBOX":
-			if err := mailbox.AddMailbox(Mailbox, s.ctx, s.store, s.log); err != nil {
+			if err := mailbox.AddMailbox(body, s.ctx, s.store, s.log); err != nil {
 				return err
 			}
 
 			return s.WriteJSON(w, http.StatusOK, ApiResponse{
 				Success: true,
 				Data:    "Mailbox Inserted",
+			})
+		case "READ_MAILBOX":
+			mailboxData, err := mailbox.ReadMailbox(body, s.ctx, s.store, s.log)
+			if err != nil {
+				return err
+			}
+
+			return s.WriteJSON(w, http.StatusOK, ApiResponse{
+				Success: true,
+				Data:    mailboxData,
+			})
+		case "DELETE_MAILBOX":
+			if err := mailbox.DeleteMailbox(body, s.ctx, s.store, s.log); err != nil {
+				return err
+			}
+
+			return s.WriteJSON(w, http.StatusOK, ApiResponse{
+				Success: true,
+				Data:    "Mailbox Deleted",
 			})
 		default:
 			return fmt.Errorf("invalid payload")

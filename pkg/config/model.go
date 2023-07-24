@@ -4,7 +4,8 @@ type Config struct {
 	BindAddress   string `yaml:"bind-address"`
 	Authorization string `yaml:"authorization"`
 
-	DSN string `yaml:"dsn"`
+	DSN      string `yaml:"dsn"`
+	DebugDSN string `yaml:"debug-dsn"`
 
 	CutOffTime string `yaml:"cutoff-time"`
 	Production bool   `yaml:"production"`

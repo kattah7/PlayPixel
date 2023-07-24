@@ -14,6 +14,18 @@ import (
 
 func main() {
 	cfg := config.New()
+	if !cfg.Production {
+		fmt.Printf("Running in development mode\n")
+
+		if cfg.DebugDSN == "" {
+			fmt.Fprintf(os.Stderr, "No debug DSN supplied\n")
+			os.Exit(1)
+		}
+
+		cfg.DSN = cfg.DebugDSN
+		cfg.LogDevelopment = true
+		cfg.LogLevel = "debug"
+	}
 
 	var atomicLogLevel zap.AtomicLevel
 	var err error
