@@ -64,7 +64,7 @@ func (s *APIServer) Run() {
 		})
 	})
 
-	log.Println("Listening on", s.cfg.BindAddress)
+	log.Println("PlayPixel API Listening on", s.cfg.BindAddress)
 
 	srv := &http.Server{
 		Handler:      router,
