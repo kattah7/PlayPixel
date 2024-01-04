@@ -64,7 +64,11 @@ func (s *APIServer) Run() {
 		})
 	})
 
-	log.Println("PlayPixel API Listening on", s.cfg.BindAddress)
+	if !s.cfg.Production {
+		s.log.Debugw("PlayPixel API Listening on", "port", s.cfg.BindAddress)
+	} else {
+		log.Println("PlayPixel API Listening on", s.cfg.BindAddress)
+	}
 
 	srv := &http.Server{
 		Handler:      router,

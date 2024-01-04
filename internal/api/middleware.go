@@ -26,7 +26,11 @@ func (s *APIServer) Middleware(f apiFunc, auth bool) http.HandlerFunc {
 			}
 		}
 
-		log.Println(r.Method, r.URL.Path)
+		if !s.cfg.Production {
+			s.log.Debugw(r.Method + r.URL.Path)
+		} else {
+			log.Println(r.Method, r.URL.Path)
+		}
 
 		if err := f(w, r); err != nil {
 			s.WriteJSON(w, http.StatusOK, ApiResponse{Error: err.Error()})
