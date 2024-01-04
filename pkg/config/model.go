@@ -7,7 +7,6 @@ type Config struct {
 	DSN      string `yaml:"dsn"`
 	DebugDSN string `yaml:"debug-dsn"`
 
-	CutOffTime string `yaml:"cutoff-time"`
 	Production bool   `yaml:"production"`
 	Cronjob    string `yaml:"cron-job"`
 

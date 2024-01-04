@@ -50,17 +50,17 @@ func (s *APIServer) Run() {
 			Handler(handler)
 	}
 
-	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		s.WriteJSON(w, http.StatusOK, ApiResponse{
-			Success: false,
-			Error:   "Endpoint not found",
-		})
-	})
-
 	router.MethodNotAllowedHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		s.WriteJSON(w, http.StatusOK, ApiResponse{
 			Success: false,
 			Error:   "Method not allowed",
+		})
+	})
+
+	router.NotFoundHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		s.WriteJSON(w, http.StatusOK, ApiResponse{
+			Success: false,
+			Error:   "Endpoint not found",
 		})
 	})
 

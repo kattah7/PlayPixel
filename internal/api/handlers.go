@@ -39,7 +39,7 @@ func (s *APIServer) Mailbox(w http.ResponseWriter, r *http.Request) error {
 				Success: true,
 				Data:    mailboxData,
 			})
-		case "DELETE_MAILBOX":
+		case "CLAIM_MAILBOX":
 			if err := mailbox.DeleteMailbox(body, s.ctx, s.store, s.log); err != nil {
 				return err
 			}
